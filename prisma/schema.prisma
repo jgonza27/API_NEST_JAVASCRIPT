@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+  // output  = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Department {
+  id       Int       @default(autoincrement()) @id
+  name     String    @unique
+  phone    String
+  email    String?
+  
+  Employee Employee[]
+}
+
+model Employee {
+  DNI           String   @id
+  name          String
+  login         String   @unique
+  password      String
+  department_id Int
+
+  department Department @relation(fields: [department_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
