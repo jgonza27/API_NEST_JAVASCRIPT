@@ -8,27 +8,26 @@ export class DepartmentsController {
 
     @Get()
     index() {
-        return this.departmentService.getAllDepartments();
+        return this.departmentService.getAllDepartments()
     }
 
     @Get('/:id')
     show(@Param('id') id: string) {
-        return this.departmentService.getOneDepartment(id);
+        return this.departmentService.getOneDepartment(id)
     }
 
     @Post()
     store(@Body() department: Departments) {
-        return this.departmentService.createOneDepartment(department);
+        return this.departmentService.createOneDepartment(department)
     }
-
 
     @Put('/:id')
     update(@Param('id') id: string, @Body() department: Departments) {
-        return this.departmentService.updateOneDepartment(id, department);
+        return this.departmentService.updateOneDepartment(id, department)
     }
 
     @Delete('/:id')
     destroy(@Param('id') id: string) {
-        return this.departmentService.deleteOneDepartment(id);
+        return this.departmentService.deleteOneDepartment(id)
     }
 }

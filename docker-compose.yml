@@ -1,0 +1,35 @@
+services:
+  # NodeJS Service
+  node:
+    image: node:latest
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    tty: true
+    depends_on:
+      - mariadb
+
+  # MariaDB Service
+  mariadb:
+    image: mariadb:10.11
+    environment:
+      MYSQL_ROOT_PASSWORD: password123
+      MYSQL_DATABASE: rest
+    volumes:
+      - mysqldata:/var/lib/mysql
+
+  # phpMyAdmin Service
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mariadb
+    depends_on:
+      - mariadb
+
+volumes:
+  mysqldata:
