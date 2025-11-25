@@ -1,64 +1,63 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { Employees } from './employees.interface';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class EmployeesService {
     constructor(private prisma: PrismaService) { }
 
     async getAllEmployees() {
-        const employees = await this.prisma.employee.findMany();
-        return { 'respuesta': employees }
+        return this.prisma.employee.findMany();
     }
 
     async getOneEmployee(DNI: string) {
-        const employeeFound = await this.prisma.employee.findUnique({
-            where: { DNI: DNI }
-        })
-        if (!employeeFound) {
-            return { 'respuesta': `Empleado con DNI ${DNI} no encontrado` }
-        }
-        return { 'respuesta': employeeFound }
+        return this.prisma.employee.findUnique({
+            where: { DNI },
+        });
     }
 
     async createOneEmployee(employee: Employees) {
         const departmentFound = await this.prisma.department.findUnique({
-            where: { id: employee.department_id }
-        })
-        if (!departmentFound)
-            return { 'respuesta': `Departamento con id ${employee.department_id} no encontrado` }
+            where: { id: employee.department_id },
+        });
+
+        if (!departmentFound) {
+            return { 'respuesta': `Departamento con id ${employee.department_id} no encontrado` };
+        }
+
+        // Generamos hash de la contraseña
+        const saltOrRounds = 10;
+        const salt = await bcrypt.genSalt(saltOrRounds);
+        const password = employee.password;
+        const hash = await bcrypt.hash(password, salt);
+        employee.password = hash;
+
         await this.prisma.employee.create({ data: employee });
-        return { 'respuesta': 'Empleado creado con exito' }
+        return { 'respuesta': 'Empleado creado con exito' };
     }
 
     async updateOneEmployee(DNI: string, employee: Employees) {
-        try {
-            await this.prisma.employee.update({
-                where: { DNI: DNI }, data: employee
-            })
-            return { 'respuesta': 'Empleado actualizado con exito' }
-        } catch (error) {
-            return { 'respuesta': `Empleado con DNI ${DNI} no encontrado` }
-        }
+        return this.prisma.employee.update({
+            where: { DNI },
+            data: employee,
+        });
     }
 
-    async deleteOneDepartment(DNI: string) {
-        try {
-            await this.prisma.employee.delete({
-                where: { DNI: DNI }
-            })
-            return { 'respuesta': 'Empleado borrado con exito' }
-        } catch (error) {
-            return { 'respuesta': `Empleado con DNI ${DNI} no encontrado` }
-        }
+    async deleteOneEmployee(DNI: string) {
+        return this.prisma.employee.delete({
+            where: { DNI },
+        });
     }
 
     async getOneEmployeeByLogin(login: string) {
-        const employeeFound = await this.prisma.employee.findUnique({
-            where: { login: login }
-        })
-        if (!employeeFound)
-            return { 'respuesta': `Empleado con Login ${login} no encontrado` }
-        return { 'respuesta': employeeFound }
+        const found = await this.prisma.employee.findUnique({
+            where: { login },
+        });
+
+        if (!found)
+            return { 'respuesta': `Empleado con Login ${login} no encontrado` };
+
+        return { 'respuesta': found };
     }
 }

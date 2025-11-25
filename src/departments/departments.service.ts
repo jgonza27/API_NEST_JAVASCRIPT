@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Departments } from './departments.interface';
+import { Departments } from './departments';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
@@ -27,22 +27,28 @@ export class DepartmentsService {
     }
 
     async createOneDepartment(department: Departments) {
-        await this.prisma.department.create({ data: department })
-        return { 'respuesta': 'Departamento creado con exito' }
+        await this.prisma.department.create(
+            { data: department }
+        );
+
+        return { 'respuesta': 'Departamento creado con exito' };
     }
+
 
     async updateOneDepartment(id: string, department: Departments) {
         try {
-            const departmentID = parseInt(id)
+            const departmentID = parseInt(id);
             await this.prisma.department.update({
                 where: { id: departmentID },
                 data: department
-            })
-            return { 'respuesta': `Departamento actualizado con exito` }
-        } catch (error) {
-            return { 'respuesta': `Departamento con id ${id} no encontrado` }
+            });
+            return { 'respuesta': 'Departamento actualizado con exito' };
+        }
+        catch (error) {
+            return { 'respuesta': `Departamento con id ${id} no encontrado` };
         }
     }
+
 
     async deleteOneDepartment(id: string) {
         try {
